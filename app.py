@@ -33,21 +33,21 @@ PALETA_CLARA = {
 }
 
 PALETA_ESCURA = {
-    "bg": "#161412",
-    "bg2": "#221E19",
-    "border": "#3A332A",
-    "border_forte": "#4A4030",
-    "tinta": "#EAD9AF",
-    "tinta_suave": "#B7A87E",
-    "tinta_fraca": "#8A7C5C",
+    "bg": "#10142A",
+    "bg2": "#1D2440",
+    "border": "#2E3860",
+    "border_forte": "#3D4A78",
+    "tinta": "#E7E2D0",
+    "tinta_suave": "#9099C0",
+    "tinta_fraca": "#6E77A3",
     "acento": "#D9A93B",
     "acento_texto": "#D9A93B",
     "marca_bg": "#4A3B1E",
     "marca_tinta": "#F8E9BE",
-    "titulo": "#F1DFAE",
+    "titulo": "#F0E6C8",
     "fundo_css": (
-        "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.04) 0%, "
-        "rgba(0,0,0,0) 55%), linear-gradient(160deg, #221E19 0%, #161412 65%);"
+        "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.05) 0%, "
+        "rgba(0,0,0,0) 55%), linear-gradient(160deg, #1B2244 0%, #10142A 65%);"
     ),
 }
 
