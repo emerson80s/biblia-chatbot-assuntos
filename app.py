@@ -1,3 +1,4 @@
+import base64
 import html
 import json
 import re
@@ -33,22 +34,19 @@ PALETA_CLARA = {
 }
 
 PALETA_ESCURA = {
-    "bg": "#080A1C",
-    "bg2": "#131934",
-    "border": "#26305A",
-    "border_forte": "#34406E",
-    "tinta": "#E7E2D0",
-    "tinta_suave": "#8890B8",
-    "tinta_fraca": "#616A98",
+    "bg": "#121212",
+    "bg2": "#1E1E1E",
+    "border": "#333333",
+    "border_forte": "#454545",
+    "tinta": "#E0E0E0",
+    "tinta_suave": "#AFAFAF",
+    "tinta_fraca": "#888888",
     "acento": "#D9A93B",
     "acento_texto": "#D9A93B",
     "marca_bg": "#4A3B1E",
     "marca_tinta": "#F8E9BE",
     "titulo": "#F2C744",
-    "fundo_css": (
-        "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.04) 0%, "
-        "rgba(0,0,0,0) 55%), linear-gradient(160deg, #141A38 0%, #080A1C 65%);"
-    ),
+    "fundo_css": "background: #121212;",
 }
 
 if "modo_escuro" not in st.session_state:
@@ -114,31 +112,27 @@ html, body, [class*="css"] {
 }
 
 .hero {
-    display: flex;
-    align-items: center;
-    gap: 1.3rem;
-    padding: 1.6rem 0 0.6rem;
+    padding: 1.2rem 0 0.6rem;
     border-bottom: 1px solid ${border_forte};
     margin-bottom: 1.4rem;
 }
-.hero .icon {
-    line-height: 1;
-    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
-    flex: 0 0 auto;
-}
-.hero .icon svg {
-    width: 7.6rem;
-    height: auto;
+.hero-banner {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
     display: block;
+    border-radius: 10px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+    margin-bottom: 1.1rem;
 }
-.hero h1 {
+.hero-text h1 {
     font-family: 'Lora', serif;
     font-weight: 600;
     font-size: 2.3rem;
     margin: 0;
     color: ${titulo};
 }
-.hero p {
+.hero-text p {
     margin: 0.15rem 0 0;
     color: ${tinta_suave};
     font-size: 0.95rem;
@@ -278,44 +272,13 @@ html, body, [class*="css"] {
 
 st.markdown(CSS, unsafe_allow_html=True)
 
+BANNER_B64 = base64.b64encode(open("assets/biblia-banner.jpg", "rb").read()).decode()
+
 with topo_esq:
     st.markdown(
-        '<div class="hero"><div class="icon">'
-        '<svg viewBox="0 0 140 122" xmlns="http://www.w3.org/2000/svg">'
-        '<defs>'
-        '<linearGradient id="couro" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#2A2A2A"/>'
-        '<stop offset="100%" stop-color="#0C0C0C"/>'
-        '</linearGradient>'
-        '<linearGradient id="paginaClara" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#FFFDF6"/>'
-        '<stop offset="100%" stop-color="#E7DAB2"/>'
-        '</linearGradient>'
-        '<linearGradient id="ouro" x1="0" y1="0" x2="1" y2="1">'
-        '<stop offset="0%" stop-color="#F6E2A0"/>'
-        '<stop offset="100%" stop-color="#B9852A"/>'
-        '</linearGradient>'
-        '</defs>'
-        '<ellipse cx="70" cy="112" rx="58" ry="6" fill="#000000" opacity="0.28"/>'
-        '<path d="M70 16 C 50 4 18 3 4 16 L 4 92 C 18 80 50 82 70 96 C 90 82 122 80 136 92 L 136 16 '
-        'C 122 3 90 4 70 16 Z" fill="url(#couro)"/>'
-        '<path d="M70 16 C 50 4 18 3 4 16 L 4 92 C 18 80 50 82 70 96 Z" fill="none" stroke="#000000" stroke-width="0.5" opacity="0.4"/>'
-        '<path d="M69 8 L 74 8 L 74 108 L 70 100 L 66 108 Z" fill="#7A1F26"/>'
-        '<path d="M70 22 C 53 12 26 11 13 21 L 13 86 C 26 77 53 78 70 88 Z" fill="url(#paginaClara)"/>'
-        '<path d="M70 22 C 87 12 114 11 127 21 L 127 86 C 114 77 87 78 70 88 Z" fill="url(#paginaClara)"/>'
-        '<path d="M70 22 C 53 12 26 11 13 21 L 13 86 C 26 77 53 78 70 88 '
-        'C 87 78 114 77 127 86 L 127 21 C 114 11 87 12 70 22 Z" fill="none" stroke="url(#ouro)" stroke-width="1.6"/>'
-        '<line x1="70" y1="22" x2="70" y2="88" stroke="#B9852A" stroke-width="1.3"/>'
-        '<path d="M20 33 Q 45 26 62 35" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
-        '<path d="M20 44 Q 45 37 62 46" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
-        '<path d="M20 55 Q 45 48 62 57" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
-        '<path d="M120 33 Q 95 26 78 35" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
-        '<path d="M120 44 Q 95 37 78 46" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
-        '<path d="M120 55 Q 95 48 78 57" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
-        '<path d="M70 16 C 50 4 18 3 4 16" fill="none" stroke="#4A4A4A" stroke-width="1"/>'
-        '<path d="M70 16 C 90 4 122 3 136 16" fill="none" stroke="#4A4A4A" stroke-width="1"/>'
-        '</svg>'
-        '</div><div>'
+        '<div class="hero">'
+        f'<img class="hero-banner" src="data:image/jpeg;base64,{BANNER_B64}" alt="Bíblia de capa de couro preta com crucifixo"/>'
+        '<div class="hero-text">'
         '<h1>Bíblia por Assunto</h1>'
         '<p>Busca semântica de passagens por tema, não apenas por palavra exata, entre traduções de domínio público.</p>'
         '</div></div>',
@@ -379,7 +342,7 @@ assunto = st.text_input(
 top_k = st.slider("Quantas passagens mostrar", 3, 20, 8)
 contexto = st.slider("Versículos de contexto ao redor de cada resultado", 0, 6, 3)
 
-if st.button("🎲 Versículo aleatório"):
+if st.button("✨ Versículo surpresa"):
     st.session_state["ultimo_aleatorio"] = versiculo_aleatorio(versao_base, livros_filtro)
 
 
@@ -433,7 +396,7 @@ if "ultimo_aleatorio" in st.session_state:
     v = st.session_state["ultimo_aleatorio"]
     cartao = (
         '<div class="verse-card">'
-        f'<div class="verse-ref">🎲 {html.escape(v["ref"])}</div>'
+        f'<div class="verse-ref">✨ {html.escape(v["ref"])}</div>'
         f'<div class="verse-text">{limpar_travessoes(v["texto"])}</div>'
         f'{botoes_acao(v["ref"], v["texto"], versoes[versao_base])}'
         '</div>'
