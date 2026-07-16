@@ -30,7 +30,10 @@ PALETA_CLARA = {
     "marca_bg": "#F1D999",
     "marca_tinta": "#4A3B1E",
     "titulo": "#9C8A63",
-    "fundo_css": "background: #F6EFE0;",
+    "fundo_css": (
+        "background: radial-gradient(ellipse at center, #F7EFDC 0%, #F2E5C4 45%, "
+        "#DFC98F 72%, #A9814A 90%, #6B4A24 100%);"
+    ),
 }
 
 PALETA_ESCURA = {
@@ -67,6 +70,10 @@ CSS = Template("""
 
 html, body, [class*="css"] {
     font-family: 'Nunito Sans', sans-serif;
+    letter-spacing: 0.02em;
+}
+.verse-text, .hero-text p, .secao-label, .verse-ref, .hero-text h1 {
+    letter-spacing: 0.025em;
 }
 
 :root, .stApp {
