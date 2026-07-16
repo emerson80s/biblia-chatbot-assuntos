@@ -96,6 +96,9 @@ html, body, [class*="css"] {
     border-color: ${border_forte} !important;
     fill: ${tinta} !important;
 }
+[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] * {
+    background-color: transparent !important;
+}
 [data-baseweb="popover"] *, [data-baseweb="menu"] * {
     background-color: ${bg2} !important;
     color: ${tinta} !important;
