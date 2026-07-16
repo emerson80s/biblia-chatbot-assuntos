@@ -174,7 +174,7 @@ html, body, [class*="css"] {
     box-shadow: 0 0 0 1px ${acento} !important;
 }
 
-[data-testid="stSelectbox"] label, [data-testid="stSlider"] label {
+[data-testid="stSelectbox"] label {
     font-weight: 600;
     color: ${tinta};
 }
@@ -188,7 +188,7 @@ html, body, [class*="css"] {
     margin: 0.4rem 0 0.3rem;
 }
 
-.stToggle label, [data-testid="stTextInput"] label {
+.stToggle label, [data-testid="stTextInput"] label, [data-testid="stSlider"] label {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 0.72rem;
     font-weight: 600;
@@ -200,7 +200,7 @@ html, body, [class*="css"] {
 [data-testid="stButton"] button {
     background: ${bg2};
     border: 1px solid ${border_forte};
-    color: ${acento_texto};
+    color: ${tinta_fraca};
     font-family: 'Nunito Sans', sans-serif;
     font-size: 0.85rem;
     padding: 0.25rem 0.8rem;
@@ -342,7 +342,22 @@ if st.session_state["historico"]:
             if st.button(termo, key=f"hist_{i}_{termo}"):
                 st.session_state["assunto_input"] = termo
 
-modo_comparacao = st.toggle("Comparar as 3 traduções lado a lado", value=False)
+assunto = st.text_input(
+    "Sobre qual assunto você quer encontrar passagens?",
+    placeholder="ex: perdão, medo, sabedoria, família...",
+    key="assunto_input",
+    help="Digite um tema livre — não precisa ser a palavra exata do texto bíblico. A busca entende o significado.",
+)
+
+col_aleatorio, _ = st.columns([1, 3])
+with col_aleatorio:
+    aleatorio_clicado = st.button("✨ Versículo surpresa", help="Mostra um versículo qualquer, sem precisar buscar por assunto.")
+
+modo_comparacao = st.toggle(
+    "Comparar as 3 traduções lado a lado",
+    value=False,
+    help="Mostra a mesma passagem encontrada nas 3 traduções ao mesmo tempo, para comparar as palavras usadas em cada uma.",
+)
 
 if modo_comparacao:
     versao_base = st.selectbox(
@@ -357,9 +372,14 @@ else:
         options=list(versoes.keys()),
         format_func=lambda k: versoes[k],
         index=0,
+        help="Todas as traduções disponíveis são de domínio público — podem ser usadas livremente.",
     )
 
-escopo = st.selectbox("Buscar em", ["Toda a Bíblia", "Antigo Testamento", "Novo Testamento", "Um livro específico"])
+escopo = st.selectbox(
+    "Buscar em",
+    ["Toda a Bíblia", "Antigo Testamento", "Novo Testamento", "Um livro específico"],
+    help="Restringe a busca a uma parte específica da Bíblia, em vez de procurar no texto todo.",
+)
 livros_filtro = None
 if escopo in TESTAMENTOS:
     livros_filtro = TESTAMENTOS[escopo]
@@ -367,15 +387,18 @@ elif escopo == "Um livro específico":
     livro_escolhido = st.selectbox("Livro", LIVROS_ORDEM)
     livros_filtro = [livro_escolhido]
 
-assunto = st.text_input(
-    "Sobre qual assunto você quer encontrar passagens?",
-    placeholder="ex: perdão, medo, sabedoria, família...",
-    key="assunto_input",
+top_k = st.slider(
+    "Quantas passagens mostrar",
+    3, 20, 8,
+    help="Quantos versículos diferentes (resultados) aparecem na tela, do mais ao menos relevante para o assunto buscado.",
 )
-top_k = st.slider("Quantas passagens mostrar", 3, 20, 8)
-contexto = st.slider("Versículos de contexto ao redor de cada resultado", 0, 6, 3)
+contexto = st.slider(
+    "Versículos de contexto ao redor de cada resultado",
+    0, 6, 3,
+    help="Para cada resultado, quantos versículos vizinhos (antes e depois) mostrar junto — forma uma passagem de leitura, não só uma linha isolada. O versículo que realmente bateu com a busca aparece em negrito.",
+)
 
-if st.button("✨ Versículo surpresa"):
+if aleatorio_clicado:
     st.session_state["ultimo_aleatorio"] = versiculo_aleatorio(versao_base, livros_filtro)
 
 
