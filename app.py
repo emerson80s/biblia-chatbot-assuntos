@@ -98,9 +98,12 @@ html, body, [class*="css"] {
 [role="option"]:hover, [aria-selected="true"] {
     background-color: ${border} !important;
 }
-[data-testid="stSelectbox"] svg, [data-testid="stSelectbox"] svg * {
+[data-testid="stSelectbox"] svg {
     background-color: transparent !important;
     fill: ${tinta_fraca} !important;
+}
+[data-testid="stSelectbox"] svg path[fill="none"] {
+    fill: none !important;
 }
 [data-testid="stSelectbox"] button[aria-label="Open"],
 [data-testid="stSelectbox"] button[aria-label="Close"] {
@@ -119,7 +122,7 @@ html, body, [class*="css"] {
     margin-bottom: 1.4rem;
 }
 .hero .icon {
-    font-size: 4.6rem;
+    font-size: 6.8rem;
     line-height: 1;
     filter: drop-shadow(0 3px 4px rgba(0,0,0,0.35));
 }
