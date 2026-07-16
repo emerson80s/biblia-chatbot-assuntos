@@ -44,7 +44,7 @@ PALETA_ESCURA = {
     "acento_texto": "#D9A93B",
     "marca_bg": "#4A3B1E",
     "marca_tinta": "#F8E9BE",
-    "titulo": "#F0E6C8",
+    "titulo": "#F2C744",
     "fundo_css": (
         "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.05) 0%, "
         "rgba(0,0,0,0) 55%), linear-gradient(160deg, #1B2244 0%, #10142A 65%);"
@@ -122,9 +122,14 @@ html, body, [class*="css"] {
     margin-bottom: 1.4rem;
 }
 .hero .icon {
-    font-size: 6.8rem;
     line-height: 1;
-    filter: drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+    flex: 0 0 auto;
+}
+.hero .icon svg {
+    width: 5.4rem;
+    height: 5.4rem;
+    display: block;
 }
 .hero h1 {
     font-family: 'Lora', serif;
@@ -275,7 +280,34 @@ st.markdown(CSS, unsafe_allow_html=True)
 
 with topo_esq:
     st.markdown(
-        '<div class="hero"><div class="icon">📖</div><div>'
+        '<div class="hero"><div class="icon">'
+        '<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">'
+        '<defs>'
+        '<linearGradient id="capaOuro" x1="0" y1="0" x2="1" y2="1">'
+        '<stop offset="0%" stop-color="#F6E2A0"/>'
+        '<stop offset="55%" stop-color="#D9A93B"/>'
+        '<stop offset="100%" stop-color="#9C7A1F"/>'
+        '</linearGradient>'
+        '<linearGradient id="paginaClara" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#FFFDF6"/>'
+        '<stop offset="100%" stop-color="#EDE3C6"/>'
+        '</linearGradient>'
+        '</defs>'
+        '<path d="M60 22 C 46 10, 20 8, 6 16 L 6 82 C 20 74, 46 76, 60 88 Z" fill="url(#paginaClara)" stroke="#8A6A22" stroke-width="1.2"/>'
+        '<path d="M60 22 C 74 10, 100 8, 114 16 L 114 82 C 100 74, 74 76, 60 88 Z" fill="url(#paginaClara)" stroke="#8A6A22" stroke-width="1.2"/>'
+        '<path d="M10 18 C 24 11, 45 11, 58 21 L 58 27 C 45 17, 24 17, 10 24 Z" fill="url(#capaOuro)"/>'
+        '<path d="M110 18 C 96 11, 75 11, 62 21 L 62 27 C 75 17, 96 17, 110 24 Z" fill="url(#capaOuro)"/>'
+        '<line x1="60" y1="22" x2="60" y2="88" stroke="#8A6A22" stroke-width="1.4"/>'
+        '<path d="M16 34 Q 34 28 52 36" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
+        '<path d="M16 44 Q 34 38 52 46" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
+        '<path d="M16 54 Q 34 48 52 56" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
+        '<path d="M104 34 Q 86 28 68 36" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
+        '<path d="M104 44 Q 86 38 68 46" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
+        '<path d="M104 54 Q 86 48 68 56" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
+        '<path d="M60 22 C 46 10, 20 8, 6 16 L 6 82 C 20 74, 46 76, 60 88 C 74 76, 100 74, 114 82 L 114 16 C 100 8, 74 10, 60 22 Z" '
+        'fill="none" stroke="url(#capaOuro)" stroke-width="2.4"/>'
+        '</svg>'
+        '</div><div>'
         '<h1>Bíblia por Assunto</h1>'
         '<p>Busca semântica de passagens por tema, não apenas por palavra exata, entre traduções de domínio público.</p>'
         '</div></div>',
