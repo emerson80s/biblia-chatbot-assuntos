@@ -188,13 +188,17 @@ html, body, [class*="css"] {
     margin: 0.4rem 0 0.3rem;
 }
 
-.stToggle label, [data-testid="stTextInput"] label, [data-testid="stSlider"] label {
+[data-testid="stCheckbox"] p, [data-testid="stTextInput"] label, [data-testid="stSlider"] label {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.07em;
     color: ${tinta_fraca} !important;
+}
+
+[data-testid="stTooltipIcon"] svg path {
+    stroke: ${tinta_fraca} !important;
 }
 
 [data-testid="stButton"] button {
