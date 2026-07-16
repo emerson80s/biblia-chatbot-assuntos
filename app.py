@@ -114,8 +114,8 @@ html, body, [class*="css"] {
 [data-testid="stSelectbox"] button[aria-label="Close"] {
     background-color: transparent !important;
 }
-[data-testid="stSelectbox"] {
-    background-color: ${bg} !important;
+[data-testid="stSelectbox"] .react-aria-ComboBox {
+    background-color: ${bg2} !important;
     border-radius: 8px;
 }
 [data-testid="stSliderTickBarMin"], [data-testid="stSliderTickBarMax"] {
