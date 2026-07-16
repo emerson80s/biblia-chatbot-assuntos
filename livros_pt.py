@@ -17,3 +17,9 @@ LIVROS = {
     "1jo": "1 João", "2jo": "2 João", "3jo": "3 João", "jd": "Judas",
     "ap": "Apocalipse",
 }
+
+# Ordem canônica dos 66 livros — usada para mapear por posição entre arquivos
+# de traduções diferentes, já que os "abbrev" de cada fonte usam grafias
+# distintas (ex.: ACF usa "job" minúsculo, ALM1911/BLIVRE usam "Jó" com acento,
+# o que colidiria com "Jo" de João se normalizássemos só removendo acentos).
+LIVROS_ORDEM = list(LIVROS.values())
