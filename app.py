@@ -33,21 +33,21 @@ PALETA_CLARA = {
 }
 
 PALETA_ESCURA = {
-    "bg": "#10142A",
-    "bg2": "#1D2440",
-    "border": "#2E3860",
-    "border_forte": "#3D4A78",
+    "bg": "#080A1C",
+    "bg2": "#131934",
+    "border": "#26305A",
+    "border_forte": "#34406E",
     "tinta": "#E7E2D0",
-    "tinta_suave": "#9099C0",
-    "tinta_fraca": "#6E77A3",
+    "tinta_suave": "#8890B8",
+    "tinta_fraca": "#616A98",
     "acento": "#D9A93B",
     "acento_texto": "#D9A93B",
     "marca_bg": "#4A3B1E",
     "marca_tinta": "#F8E9BE",
     "titulo": "#F2C744",
     "fundo_css": (
-        "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.05) 0%, "
-        "rgba(0,0,0,0) 55%), linear-gradient(160deg, #1B2244 0%, #10142A 65%);"
+        "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.04) 0%, "
+        "rgba(0,0,0,0) 55%), linear-gradient(160deg, #141A38 0%, #080A1C 65%);"
     ),
 }
 
@@ -127,8 +127,8 @@ html, body, [class*="css"] {
     flex: 0 0 auto;
 }
 .hero .icon svg {
-    width: 5.4rem;
-    height: 5.4rem;
+    width: 7.6rem;
+    height: auto;
     display: block;
 }
 .hero h1 {
@@ -281,31 +281,39 @@ st.markdown(CSS, unsafe_allow_html=True)
 with topo_esq:
     st.markdown(
         '<div class="hero"><div class="icon">'
-        '<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">'
+        '<svg viewBox="0 0 140 122" xmlns="http://www.w3.org/2000/svg">'
         '<defs>'
-        '<linearGradient id="capaOuro" x1="0" y1="0" x2="1" y2="1">'
-        '<stop offset="0%" stop-color="#F6E2A0"/>'
-        '<stop offset="55%" stop-color="#D9A93B"/>'
-        '<stop offset="100%" stop-color="#9C7A1F"/>'
+        '<linearGradient id="couro" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#2A2A2A"/>'
+        '<stop offset="100%" stop-color="#0C0C0C"/>'
         '</linearGradient>'
         '<linearGradient id="paginaClara" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0%" stop-color="#FFFDF6"/>'
-        '<stop offset="100%" stop-color="#EDE3C6"/>'
+        '<stop offset="100%" stop-color="#E7DAB2"/>'
+        '</linearGradient>'
+        '<linearGradient id="ouro" x1="0" y1="0" x2="1" y2="1">'
+        '<stop offset="0%" stop-color="#F6E2A0"/>'
+        '<stop offset="100%" stop-color="#B9852A"/>'
         '</linearGradient>'
         '</defs>'
-        '<path d="M60 22 C 46 10, 20 8, 6 16 L 6 82 C 20 74, 46 76, 60 88 Z" fill="url(#paginaClara)" stroke="#8A6A22" stroke-width="1.2"/>'
-        '<path d="M60 22 C 74 10, 100 8, 114 16 L 114 82 C 100 74, 74 76, 60 88 Z" fill="url(#paginaClara)" stroke="#8A6A22" stroke-width="1.2"/>'
-        '<path d="M10 18 C 24 11, 45 11, 58 21 L 58 27 C 45 17, 24 17, 10 24 Z" fill="url(#capaOuro)"/>'
-        '<path d="M110 18 C 96 11, 75 11, 62 21 L 62 27 C 75 17, 96 17, 110 24 Z" fill="url(#capaOuro)"/>'
-        '<line x1="60" y1="22" x2="60" y2="88" stroke="#8A6A22" stroke-width="1.4"/>'
-        '<path d="M16 34 Q 34 28 52 36" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
-        '<path d="M16 44 Q 34 38 52 46" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
-        '<path d="M16 54 Q 34 48 52 56" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
-        '<path d="M104 34 Q 86 28 68 36" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
-        '<path d="M104 44 Q 86 38 68 46" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
-        '<path d="M104 54 Q 86 48 68 56" fill="none" stroke="#C9B98A" stroke-width="1.2"/>'
-        '<path d="M60 22 C 46 10, 20 8, 6 16 L 6 82 C 20 74, 46 76, 60 88 C 74 76, 100 74, 114 82 L 114 16 C 100 8, 74 10, 60 22 Z" '
-        'fill="none" stroke="url(#capaOuro)" stroke-width="2.4"/>'
+        '<ellipse cx="70" cy="112" rx="58" ry="6" fill="#000000" opacity="0.28"/>'
+        '<path d="M70 16 C 50 4 18 3 4 16 L 4 92 C 18 80 50 82 70 96 C 90 82 122 80 136 92 L 136 16 '
+        'C 122 3 90 4 70 16 Z" fill="url(#couro)"/>'
+        '<path d="M70 16 C 50 4 18 3 4 16 L 4 92 C 18 80 50 82 70 96 Z" fill="none" stroke="#000000" stroke-width="0.5" opacity="0.4"/>'
+        '<path d="M69 8 L 74 8 L 74 108 L 70 100 L 66 108 Z" fill="#7A1F26"/>'
+        '<path d="M70 22 C 53 12 26 11 13 21 L 13 86 C 26 77 53 78 70 88 Z" fill="url(#paginaClara)"/>'
+        '<path d="M70 22 C 87 12 114 11 127 21 L 127 86 C 114 77 87 78 70 88 Z" fill="url(#paginaClara)"/>'
+        '<path d="M70 22 C 53 12 26 11 13 21 L 13 86 C 26 77 53 78 70 88 '
+        'C 87 78 114 77 127 86 L 127 21 C 114 11 87 12 70 22 Z" fill="none" stroke="url(#ouro)" stroke-width="1.6"/>'
+        '<line x1="70" y1="22" x2="70" y2="88" stroke="#B9852A" stroke-width="1.3"/>'
+        '<path d="M20 33 Q 45 26 62 35" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
+        '<path d="M20 44 Q 45 37 62 46" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
+        '<path d="M20 55 Q 45 48 62 57" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
+        '<path d="M120 33 Q 95 26 78 35" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
+        '<path d="M120 44 Q 95 37 78 46" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
+        '<path d="M120 55 Q 95 48 78 57" fill="none" stroke="#C9B98A" stroke-width="1.1"/>'
+        '<path d="M70 16 C 50 4 18 3 4 16" fill="none" stroke="#4A4A4A" stroke-width="1"/>'
+        '<path d="M70 16 C 90 4 122 3 136 16" fill="none" stroke="#4A4A4A" stroke-width="1"/>'
         '</svg>'
         '</div><div>'
         '<h1>Bíblia por Assunto</h1>'
