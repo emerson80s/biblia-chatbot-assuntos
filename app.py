@@ -114,8 +114,22 @@ html, body, [class*="css"] {
 [data-testid="stSelectbox"] button[aria-label="Close"] {
     background-color: transparent !important;
 }
+[data-testid="stSelectbox"] {
+    background-color: ${bg} !important;
+    border-radius: 8px;
+}
 [data-testid="stSliderTickBarMin"], [data-testid="stSliderTickBarMax"] {
     color: ${tinta_fraca} !important;
+}
+
+[data-testid="stAlert"], [data-testid="stAlertContainer"] {
+    background-color: ${bg2} !important;
+    border: 1px solid ${border_forte} !important;
+    color: ${tinta} !important;
+}
+[data-testid="stAlert"] *, [data-testid="stAlertContainer"] * {
+    color: ${tinta} !important;
+    fill: ${acento} !important;
 }
 
 .hero {
@@ -157,7 +171,7 @@ html, body, [class*="css"] {
     box-shadow: 0 0 0 1px ${acento} !important;
 }
 
-[data-testid="stSelectbox"] label, [data-testid="stSlider"] label, .stToggle label {
+[data-testid="stSelectbox"] label, [data-testid="stSlider"] label {
     font-weight: 600;
     color: ${tinta};
 }
@@ -169,6 +183,15 @@ html, body, [class*="css"] {
     letter-spacing: 0.07em;
     color: ${tinta_fraca};
     margin: 0.4rem 0 0.3rem;
+}
+
+.stToggle label, [data-testid="stTextInput"] label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: ${tinta_fraca} !important;
 }
 
 [data-testid="stButton"] button {
@@ -459,8 +482,6 @@ if assunto:
                 '</div>'
             )
             st.markdown(cartao, unsafe_allow_html=True)
-else:
-    st.info("Digite um assunto acima, escolha uma sugestão ou toque em versículo aleatório para começar.")
 
 st.markdown(
     '<div class="footer-note">Projeto de estudo · busca por similaridade semântica · '
