@@ -1,12 +1,69 @@
 import html
+import json
 import re
+from string import Template
 
 import streamlit as st
-from buscador import buscar_por_assunto, comparar_versoes, carregar_versoes_disponiveis
+from buscador import (
+    buscar_por_assunto,
+    comparar_versoes,
+    carregar_versoes_disponiveis,
+    versiculo_aleatorio,
+    obter_passagem,
+    TESTAMENTOS,
+)
+from livros_pt import LIVROS_ORDEM
 
 st.set_page_config(page_title="Bíblia por Assunto", page_icon="📖", layout="centered")
 
-st.markdown("""
+PALETA_CLARA = {
+    "bg": "#F6EFE0",
+    "bg2": "#FFFBF2",
+    "border": "#E6D8B4",
+    "border_forte": "#D8C79A",
+    "tinta": "#9C8A63",
+    "tinta_suave": "#9C8A63",
+    "tinta_fraca": "#9C8A63",
+    "acento": "#9A6B24",
+    "acento_texto": "#9C8A63",
+    "marca_bg": "#F1D999",
+    "marca_tinta": "#4A3B1E",
+    "titulo": "#9C8A63",
+    "fundo_css": "background: #F6EFE0;",
+}
+
+PALETA_ESCURA = {
+    "bg": "#161412",
+    "bg2": "#221E19",
+    "border": "#3A332A",
+    "border_forte": "#4A4030",
+    "tinta": "#EAD9AF",
+    "tinta_suave": "#B7A87E",
+    "tinta_fraca": "#8A7C5C",
+    "acento": "#D9A93B",
+    "acento_texto": "#D9A93B",
+    "marca_bg": "#4A3B1E",
+    "marca_tinta": "#F8E9BE",
+    "titulo": "#F1DFAE",
+    "fundo_css": (
+        "background: radial-gradient(ellipse at 15% 0%, rgba(255,255,255,0.04) 0%, "
+        "rgba(0,0,0,0) 55%), linear-gradient(160deg, #221E19 0%, #161412 65%);"
+    ),
+}
+
+if "modo_escuro" not in st.session_state:
+    st.session_state["modo_escuro"] = True
+
+topo_esq, topo_dir = st.columns([5, 1])
+with topo_dir:
+    st.session_state["modo_escuro"] = st.toggle(
+        "🌙" if st.session_state["modo_escuro"] else "☀️",
+        value=st.session_state["modo_escuro"],
+    )
+
+P = PALETA_ESCURA if st.session_state["modo_escuro"] else PALETA_CLARA
+
+CSS = Template("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&display=swap');
 
@@ -14,75 +71,129 @@ html, body, [class*="css"] {
     font-family: 'Nunito Sans', sans-serif;
 }
 
+:root, .stApp {
+    --primary-color: ${acento};
+    --background-color: ${bg};
+    --secondary-background-color: ${bg2};
+    --text-color: ${tinta};
+}
+
 [data-testid="stAppViewContainer"], [data-testid="stApp"] {
-    background:
-        radial-gradient(ellipse at 20% 0%, rgba(90,30,36,0.55) 0%, rgba(0,0,0,0) 55%),
-        radial-gradient(ellipse at 100% 30%, rgba(20,8,10,0.6) 0%, rgba(0,0,0,0) 60%),
-        linear-gradient(160deg, #33161A 0%, #2B1418 45%, #241014 100%);
+    ${fundo_css}
+}
+[data-testid="stHeader"] {
+    background: ${bg} !important;
+}
+
+[data-testid="stSelectbox"] * {
+    background-color: ${bg2} !important;
+    color: ${tinta} !important;
+    border-color: ${border_forte} !important;
+    fill: ${tinta} !important;
+}
+[data-baseweb="popover"] *, [data-baseweb="menu"] * {
+    background-color: ${bg2} !important;
+    color: ${tinta} !important;
+}
+[role="option"]:hover, [aria-selected="true"] {
+    background-color: ${border} !important;
+}
+[data-testid="stSelectbox"] svg, [data-testid="stSelectbox"] svg * {
+    background-color: transparent !important;
+    fill: ${tinta_fraca} !important;
+}
+[data-testid="stSelectbox"] button[aria-label="Open"],
+[data-testid="stSelectbox"] button[aria-label="Close"] {
+    background-color: transparent !important;
+}
+[data-testid="stSliderTickBarMin"], [data-testid="stSliderTickBarMax"] {
+    color: ${tinta_fraca} !important;
 }
 
 .hero {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 1.3rem;
     padding: 1.6rem 0 0.6rem;
-    border-bottom: 1px solid #5A3439;
+    border-bottom: 1px solid ${border_forte};
     margin-bottom: 1.4rem;
 }
 .hero .icon {
-    font-size: 2.4rem;
+    font-size: 4.6rem;
     line-height: 1;
+    filter: drop-shadow(0 3px 4px rgba(0,0,0,0.35));
 }
 .hero h1 {
     font-family: 'Lora', serif;
     font-weight: 600;
-    font-size: 2rem;
+    font-size: 2.3rem;
     margin: 0;
-    color: #F1DFAE;
+    color: ${titulo};
 }
 .hero p {
     margin: 0.15rem 0 0;
-    color: #C29B85;
+    color: ${tinta_suave};
     font-size: 0.95rem;
 }
 
 [data-testid="stTextInput"] input {
     font-family: 'Lora', serif;
     font-size: 1.05rem;
-    border: 1px solid #5A3439 !important;
-    background: #331519 !important;
-    color: #EAD9AF !important;
+    border: 1px solid ${border_forte} !important;
+    background: ${bg2} !important;
+    color: ${tinta} !important;
 }
 [data-testid="stTextInput"] input:focus {
-    border-color: #C9992B !important;
-    box-shadow: 0 0 0 1px #C9992B !important;
+    border-color: ${acento} !important;
+    box-shadow: 0 0 0 1px ${acento} !important;
 }
 
 [data-testid="stSelectbox"] label, [data-testid="stSlider"] label, .stToggle label {
     font-weight: 600;
-    color: #EAD9AF;
+    color: ${tinta};
+}
+
+.secao-label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: ${tinta_fraca};
+    margin: 0.4rem 0 0.3rem;
+}
+
+[data-testid="stButton"] button {
+    background: ${bg2};
+    border: 1px solid ${border_forte};
+    color: ${acento_texto};
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.8rem;
+    border-radius: 999px;
+}
+[data-testid="stButton"] button:hover {
+    border-color: ${acento};
 }
 
 .verse-card {
-    background: linear-gradient(160deg, #3D1B1F 0%, #331519 100%);
-    border: 1px solid #5A3439;
-    border-left: 4px solid #C9992B;
+    background: ${bg2};
+    border: 1px solid ${border};
+    border-left: 4px solid ${acento};
     border-radius: 4px;
     padding: 1.1rem 1.3rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
 }
 .verse-ref {
     font-family: 'Lora', serif;
     font-weight: 700;
     font-size: 1.05rem;
-    color: #D9A93B;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.45);
+    color: ${acento_texto};
     margin-bottom: 0.45rem;
 }
 .verse-score {
     font-size: 0.75rem;
-    color: #9C7A6E;
+    color: ${tinta_fraca};
     font-variant-numeric: tabular-nums;
     margin-left: 0.5rem;
     font-weight: 400;
@@ -91,19 +202,45 @@ html, body, [class*="css"] {
     font-family: 'Lora', serif;
     font-size: 1.08rem;
     line-height: 1.6;
-    color: #EAD9AF;
+    color: ${tinta};
 }
 .verse-text mark {
-    background: #7A4A22;
-    color: #F8E9BE;
+    background: ${marca_bg};
+    color: ${marca_tinta};
     padding: 0 0.15em;
     border-radius: 2px;
+}
+.verse-text sup {
+    font-size: 0.68em;
+    color: ${tinta_fraca};
+    margin-right: 0.1em;
+}
+.verso-central {
+    font-weight: 700;
 }
 .verse-missing {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 0.9rem;
     font-style: italic;
-    color: #9C7A6E;
+    color: ${tinta_fraca};
+}
+
+.verse-actions {
+    margin-top: 0.65rem;
+}
+.verse-btn {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.78rem;
+    background: transparent;
+    border: 1px solid ${border_forte};
+    color: ${tinta_suave};
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+.verse-btn:hover {
+    border-color: ${acento};
 }
 
 .compare-grid {
@@ -117,31 +254,54 @@ html, body, [class*="css"] {
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #9C7A6E;
+    color: ${tinta_fraca};
     margin-bottom: 0.35rem;
 }
 
 .footer-note {
     font-size: 0.82rem;
-    color: #9C7A6E;
-    border-top: 1px solid #5A3439;
+    color: ${tinta_fraca};
+    border-top: 1px solid ${border_forte};
     padding-top: 1rem;
     margin-top: 1.6rem;
 }
 </style>
-""", unsafe_allow_html=True)
+""").substitute(P)
 
-st.markdown("""
-<div class="hero">
-    <div class="icon">📖</div>
-    <div>
-        <h1>Bíblia por Assunto</h1>
-        <p>Busca semântica de passagens por tema, não apenas por palavra exata, entre traduções de domínio público.</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(CSS, unsafe_allow_html=True)
+
+with topo_esq:
+    st.markdown(
+        '<div class="hero"><div class="icon">📖</div><div>'
+        '<h1>Bíblia por Assunto</h1>'
+        '<p>Busca semântica de passagens por tema, não apenas por palavra exata, entre traduções de domínio público.</p>'
+        '</div></div>',
+        unsafe_allow_html=True,
+    )
 
 versoes = carregar_versoes_disponiveis()
+
+ASSUNTOS_POPULARES = ["amor", "medo", "fé", "ansiedade", "perdão", "sabedoria", "esperança", "família", "coragem", "gratidão"]
+
+if "assunto_input" not in st.session_state:
+    st.session_state["assunto_input"] = ""
+if "historico" not in st.session_state:
+    st.session_state["historico"] = []
+
+st.markdown('<div class="secao-label">Sugestões</div>', unsafe_allow_html=True)
+cols = st.columns(5)
+for i, topico in enumerate(ASSUNTOS_POPULARES):
+    with cols[i % 5]:
+        if st.button(topico, key=f"pop_{topico}"):
+            st.session_state["assunto_input"] = topico
+
+if st.session_state["historico"]:
+    st.markdown('<div class="secao-label">Buscas recentes</div>', unsafe_allow_html=True)
+    hist_cols = st.columns(min(5, len(st.session_state["historico"])) or 1)
+    for i, termo in enumerate(st.session_state["historico"][:5]):
+        with hist_cols[i]:
+            if st.button(termo, key=f"hist_{i}_{termo}"):
+                st.session_state["assunto_input"] = termo
 
 modo_comparacao = st.toggle("Comparar as 3 traduções lado a lado", value=False)
 
@@ -160,8 +320,24 @@ else:
         index=0,
     )
 
-assunto = st.text_input("Sobre qual assunto você quer encontrar passagens?", placeholder="ex: perdão, medo, sabedoria, família...")
+escopo = st.selectbox("Buscar em", ["Toda a Bíblia", "Antigo Testamento", "Novo Testamento", "Um livro específico"])
+livros_filtro = None
+if escopo in TESTAMENTOS:
+    livros_filtro = TESTAMENTOS[escopo]
+elif escopo == "Um livro específico":
+    livro_escolhido = st.selectbox("Livro", LIVROS_ORDEM)
+    livros_filtro = [livro_escolhido]
+
+assunto = st.text_input(
+    "Sobre qual assunto você quer encontrar passagens?",
+    placeholder="ex: perdão, medo, sabedoria, família...",
+    key="assunto_input",
+)
 top_k = st.slider("Quantas passagens mostrar", 3, 20, 8)
+contexto = st.slider("Versículos de contexto ao redor de cada resultado", 0, 6, 3)
+
+if st.button("🎲 Versículo aleatório"):
+    st.session_state["ultimo_aleatorio"] = versiculo_aleatorio(versao_base, livros_filtro)
 
 
 def limpar_travessoes(texto: str) -> str:
@@ -180,14 +356,62 @@ def destacar(texto: str, termo: str) -> str:
     return padrao.sub(lambda m: f"<mark>{m.group(0)}</mark>", escapado)
 
 
+def texto_passagem_plano(versao: str, livro: str, capitulo: int, versiculo: int, janela: int) -> str:
+    passagem = obter_passagem(versao, livro, capitulo, versiculo, janela=janela)
+    return " ".join(f'{v["num"]} {limpar_travessoes(v["texto"])}' for v in passagem)
+
+
+def renderizar_passagem(versao: str, livro: str, capitulo: int, versiculo: int, termo: str, janela: int) -> str:
+    passagem = obter_passagem(versao, livro, capitulo, versiculo, janela=janela)
+    partes = []
+    for verso in passagem:
+        texto_html = destacar(verso["texto"], termo)
+        if verso["central"]:
+            partes.append(f'<span class="verso-central"><sup>{verso["num"]}</sup> {texto_html}</span>')
+        else:
+            partes.append(f'<sup>{verso["num"]}</sup> {texto_html}')
+    return " ".join(partes)
+
+
+def botoes_acao(ref: str, texto: str, nome_versao: str) -> str:
+    texto_limpo = limpar_travessoes(texto)
+    citacao = f"“{texto_limpo}” — {ref} ({nome_versao})"
+    citacao_js = json.dumps(citacao)
+    texto_js = json.dumps(texto_limpo)
+    return (
+        '<div class="verse-actions">'
+        f"<button class=\"verse-btn\" onclick='navigator.clipboard.writeText({citacao_js})'>📋 Copiar</button>"
+        f"<button class=\"verse-btn\" onclick='speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance({texto_js}); u.lang=\"pt-BR\"; speechSynthesis.speak(u);'>🔊 Ouvir</button>"
+        "</div>"
+    )
+
+
+if "ultimo_aleatorio" in st.session_state:
+    v = st.session_state["ultimo_aleatorio"]
+    cartao = (
+        '<div class="verse-card">'
+        f'<div class="verse-ref">🎲 {html.escape(v["ref"])}</div>'
+        f'<div class="verse-text">{limpar_travessoes(v["texto"])}</div>'
+        f'{botoes_acao(v["ref"], v["texto"], versoes[versao_base])}'
+        '</div>'
+    )
+    st.markdown(cartao, unsafe_allow_html=True)
+
 if assunto:
+    historico = st.session_state["historico"]
+    if not historico or historico[0] != assunto:
+        st.session_state["historico"] = [assunto] + [t for t in historico if t != assunto][:7]
+
     with st.spinner("Buscando passagens..."):
         if modo_comparacao:
-            resultados = comparar_versoes(assunto, versao_base, list(versoes.keys()), top_k=top_k)
+            resultados = comparar_versoes(assunto, versao_base, list(versoes.keys()), top_k=top_k, livros_filtro=livros_filtro)
         else:
-            resultados = buscar_por_assunto(assunto, versao_base, top_k=top_k)
+            resultados = buscar_por_assunto(assunto, versao_base, top_k=top_k, livros_filtro=livros_filtro)
 
     st.markdown(f"#### Passagens sobre “{assunto}”")
+
+    if not resultados:
+        st.warning("Nenhuma passagem encontrada com esse filtro. Tente ampliar o escopo da busca.")
 
     if modo_comparacao:
         colunas_keys = list(versoes.keys())
@@ -196,27 +420,34 @@ if assunto:
             for k in colunas_keys:
                 texto = r["textos"].get(k)
                 if texto:
-                    corpo = f'<div class="verse-text">{destacar(texto, assunto)}</div>'
+                    passagem_html = renderizar_passagem(k, r["livro"], r["capitulo"], r["versiculo"], assunto, contexto)
+                    passagem_plana = texto_passagem_plano(k, r["livro"], r["capitulo"], r["versiculo"], contexto)
+                    corpo = f'<div class="verse-text">{passagem_html}</div>{botoes_acao(r["ref"], passagem_plana, versoes[k])}'
                 else:
                     corpo = '<div class="verse-missing">(versículo ausente nesta tradução)</div>'
                 colunas_html += f'<div class="compare-col"><div class="versao-label">{html.escape(versoes[k])}</div>{corpo}</div>'
 
-            st.markdown(f"""
-            <div class="verse-card">
-                <div class="verse-ref">{html.escape(r['ref'])}<span class="verse-score">relevância {r['score']:.2f}</span></div>
-                <div class="compare-grid">{colunas_html}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            cartao = (
+                '<div class="verse-card">'
+                f'<div class="verse-ref">{html.escape(r["ref"])}<span class="verse-score">relevância {r["score"]:.2f}</span></div>'
+                f'<div class="compare-grid">{colunas_html}</div>'
+                '</div>'
+            )
+            st.markdown(cartao, unsafe_allow_html=True)
     else:
         for r in resultados:
-            st.markdown(f"""
-            <div class="verse-card">
-                <div class="verse-ref">{html.escape(r['ref'])}<span class="verse-score">relevância {r['score']:.2f}</span></div>
-                <div class="verse-text">{destacar(r['texto'], assunto)}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            passagem_html = renderizar_passagem(versao_base, r["livro"], r["capitulo"], r["versiculo"], assunto, contexto)
+            passagem_plana = texto_passagem_plano(versao_base, r["livro"], r["capitulo"], r["versiculo"], contexto)
+            cartao = (
+                '<div class="verse-card">'
+                f'<div class="verse-ref">{html.escape(r["ref"])}<span class="verse-score">relevância {r["score"]:.2f}</span></div>'
+                f'<div class="verse-text">{passagem_html}</div>'
+                f'{botoes_acao(r["ref"], passagem_plana, versoes[versao_base])}'
+                '</div>'
+            )
+            st.markdown(cartao, unsafe_allow_html=True)
 else:
-    st.info("Digite um assunto acima para começar a busca.")
+    st.info("Digite um assunto acima, escolha uma sugestão ou toque em versículo aleatório para começar.")
 
 st.markdown(
     '<div class="footer-note">Projeto de estudo · busca por similaridade semântica · '
