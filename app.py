@@ -52,16 +52,17 @@ PALETA_ESCURA = {
     "fundo_css": "background: #121212;",
 }
 
-if "modo_escuro" not in st.session_state:
-    st.session_state["modo_escuro"] = True
+if "tema_toggle_valor" not in st.session_state:
+    st.session_state["tema_toggle_valor"] = True
 
 toggle_wrap = st.container(key="theme_toggle_wrap")
 with toggle_wrap:
-    st.session_state["modo_escuro"] = st.toggle(
-        "🌙" if st.session_state["modo_escuro"] else "☀️",
-        value=st.session_state["modo_escuro"],
+    st.toggle(
+        "🌙" if st.session_state["tema_toggle_valor"] else "☀️",
+        key="tema_toggle_valor",
     )
 
+st.session_state["modo_escuro"] = st.session_state["tema_toggle_valor"]
 P = PALETA_ESCURA if st.session_state["modo_escuro"] else PALETA_CLARA
 
 CSS = Template("""
