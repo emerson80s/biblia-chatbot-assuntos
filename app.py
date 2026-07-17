@@ -331,6 +331,8 @@ if "assunto_input" not in st.session_state:
 if "historico" not in st.session_state:
     st.session_state["historico"] = []
 
+campo_busca = st.container()
+
 st.markdown('<div class="secao-label">Sugestões</div>', unsafe_allow_html=True)
 cols = st.columns(5)
 for i, topico in enumerate(ASSUNTOS_POPULARES):
@@ -346,12 +348,13 @@ if st.session_state["historico"]:
             if st.button(termo, key=f"hist_{i}_{termo}"):
                 st.session_state["assunto_input"] = termo
 
-assunto = st.text_input(
-    "Sobre qual assunto você quer encontrar passagens?",
-    placeholder="ex: perdão, medo, sabedoria, família...",
-    key="assunto_input",
-    help="Digite um tema livre — não precisa ser a palavra exata do texto bíblico. A busca entende o significado.",
-)
+with campo_busca:
+    assunto = st.text_input(
+        "Sobre qual assunto você quer encontrar passagens?",
+        placeholder="ex: perdão, medo, sabedoria, família...",
+        key="assunto_input",
+        help="Digite um tema livre — não precisa ser a palavra exata do texto bíblico. A busca entende o significado.",
+    )
 
 col_aleatorio, _ = st.columns([1, 3])
 with col_aleatorio:
