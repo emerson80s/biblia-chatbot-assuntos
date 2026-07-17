@@ -558,6 +558,9 @@ const dados = __DADOS__;
 const w = window.parent;
 const doc = w.document;
 
+// Dispara o carregamento assíncrono das vozes para já estarem prontas no clique.
+try { w.speechSynthesis.getVoices(); } catch (e) {}
+
 function copiar(texto) {
   // execCommand é síncrono e funciona dentro do gesto do clique — mais confiável
   // aqui do que o clipboard assíncrono, que fica pendente sem ativação de usuário.
@@ -595,11 +598,53 @@ function feedback(btn) {
   setTimeout(() => { btn.innerHTML = orig; delete btn.dataset.mostrando; }, 1500);
 }
 
-function falar(texto) {
-  w.speechSynthesis.cancel();
-  const u = new w.SpeechSynthesisUtterance(texto);
-  u.lang = 'pt-BR';
-  w.speechSynthesis.speak(u);
+// As vozes disponíveis são as do dispositivo do usuário (a Web Speech API roda no
+// cliente). Preferimos as mais naturais: vozes masculinas neurais quando houver
+// (ex.: Microsoft Antônio no Windows/Edge), senão a voz de rede do Google, senão
+// qualquer pt-BR local. Nenhuma iguala um locutor profissional (ver observação).
+function escolherVoz() {
+  const vs = w.speechSynthesis.getVoices();
+  // Só vozes em português — evita pegar uma voz homônima em outro idioma
+  // (ex.: "Daniel" no macOS é inglês) que leria o texto com sotaque errado.
+  const pt = vs.filter(v => /^pt/i.test(v.lang));
+  const ptBR = pt.filter(v => /pt(-|_)?BR/i.test(v.lang));
+  const pool = ptBR.length ? ptBR : pt;
+  const achar = (frag) => pool.find(v => v.name.toLowerCase().includes(frag));
+  return achar('antonio') || achar('antônio')   // voz masculina neural (Windows/Edge)
+      || achar('google português')              // voz de rede natural (Chrome)
+      || achar('luciana')                       // voz local do macOS
+      || pool.find(v => v.localService)         // qualquer pt-BR local
+      || pool[0]
+      || null;
+}
+
+function restaurarOuvir() {
+  const b = w.__bibliaOuvirBtn;
+  if (b) { b.innerHTML = w.__bibliaOuvirOrig || '🔊 Ouvir'; w.__bibliaOuvirBtn = null; }
+}
+
+function falar(texto, btn) {
+  const ss = w.speechSynthesis;
+  // Segundo clique enquanto lê: interrompe a leitura.
+  if (ss.speaking || ss.pending) { ss.cancel(); restaurarOuvir(); return; }
+  restaurarOuvir();
+  w.__bibliaOuvirBtn = btn;
+  w.__bibliaOuvirOrig = btn.innerHTML;
+  btn.innerHTML = '⏸ Parar';
+  const voz = escolherVoz();
+  // Divide em frases: contorna o bug do Chrome que corta vozes de rede após ~15s.
+  const partes = (texto.match(/[^.!?…]+[.!?…]*/g) || [texto])
+    .map(s => s.trim()).filter(Boolean);
+  partes.forEach((parte, idx) => {
+    const u = new w.SpeechSynthesisUtterance(parte);
+    u.lang = 'pt-BR';
+    if (voz) u.voice = voz;
+    u.rate = 0.92;   // leitura pausada, de narração
+    u.pitch = 0.9;   // levemente mais grave
+    if (idx === partes.length - 1) u.onend = restaurarOuvir;
+    u.onerror = restaurarOuvir;
+    ss.speak(u);
+  });
 }
 
 // Delegação de evento no body do documento pai: um único listener que resolve o
@@ -614,7 +659,7 @@ function handler(e) {
   const a = dados[parseInt(m[2], 10)];
   if (!a) return;
   if (m[1] === 'copiar') { copiar(a.copiar); feedback(btn); }
-  else { falar(a.ouvir); }
+  else { falar(a.ouvir, btn); }
 }
 
 if (w.__bibliaHandler) doc.body.removeEventListener('click', w.__bibliaHandler);
