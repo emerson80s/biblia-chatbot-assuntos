@@ -201,6 +201,16 @@ html, body, [class*="css"] {
     stroke: ${tinta_fraca} !important;
 }
 
+[data-testid="stHorizontalBlock"] {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+}
+[data-testid="stHorizontalBlock"] [data-testid="stColumn"] {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+}
+
 [data-testid="stButton"] button {
     background: ${bg2};
     border: 1px solid ${border_forte};
@@ -324,7 +334,7 @@ with topo_esq:
 
 versoes = carregar_versoes_disponiveis()
 
-ASSUNTOS_POPULARES = ["amor", "medo", "fé", "ansiedade", "perdão", "sabedoria", "esperança", "família", "coragem", "gratidão"]
+ASSUNTOS_POPULARES = ["perdão", "família", "gratidão", "esperança"]
 
 if "assunto_input" not in st.session_state:
     st.session_state["assunto_input"] = ""
@@ -334,9 +344,9 @@ if "historico" not in st.session_state:
 campo_busca = st.container()
 
 st.markdown('<div class="secao-label">Sugestões</div>', unsafe_allow_html=True)
-cols = st.columns(5)
+cols = st.columns(len(ASSUNTOS_POPULARES))
 for i, topico in enumerate(ASSUNTOS_POPULARES):
-    with cols[i % 5]:
+    with cols[i]:
         if st.button(topico, key=f"pop_{topico}"):
             st.session_state["assunto_input"] = topico
 
