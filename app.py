@@ -409,11 +409,7 @@ top_k = st.slider(
     3, 20, 8,
     help="Quantos versículos diferentes (resultados) aparecem na tela, do mais ao menos relevante para o assunto buscado.",
 )
-contexto = st.slider(
-    "Versículos de contexto ao redor de cada resultado",
-    0, 6, 3,
-    help="Para cada resultado, quantos versículos vizinhos (antes e depois) mostrar junto — forma uma passagem de leitura, não só uma linha isolada. O versículo que realmente bateu com a busca aparece em negrito.",
-)
+contexto = 3  # versículos de contexto ao redor de cada resultado (fixo)
 
 if aleatorio_clicado:
     st.session_state["ultimo_aleatorio"] = versiculo_aleatorio(versao_base, livros_filtro)
