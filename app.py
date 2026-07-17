@@ -448,6 +448,13 @@ def texto_passagem_plano(versao: str, livro: str, capitulo: int, versiculo: int,
     return " ".join(f'{v["num"]} {limpar_travessoes(v["texto"])}' for v in passagem)
 
 
+def texto_passagem_falado(versao: str, livro: str, capitulo: int, versiculo: int, janela: int) -> str:
+    # Versão para leitura em voz: sem os números dos versículos, para a voz não
+    # ficar dizendo "nove", "dez" no meio do texto.
+    passagem = obter_passagem(versao, livro, capitulo, versiculo, janela=janela)
+    return " ".join(limpar_travessoes(v["texto"]) for v in passagem)
+
+
 def renderizar_passagem(versao: str, livro: str, capitulo: int, versiculo: int, termo: str, janela: int) -> str:
     passagem = obter_passagem(versao, livro, capitulo, versiculo, janela=janela)
     partes = []
@@ -466,11 +473,13 @@ def renderizar_passagem(versao: str, livro: str, capitulo: int, versiculo: int, 
 ACOES_CLIPBOARD: list[dict] = []
 
 
-def botoes_acao(ref: str, texto: str, nome_versao: str) -> str:
+def botoes_acao(ref: str, texto: str, nome_versao: str, texto_falado: str | None = None) -> str:
     texto_limpo = limpar_travessoes(texto)
+    # A leitura usa o texto sem números de versículo; o copiado mantém os números.
+    falado = limpar_travessoes(texto_falado) if texto_falado is not None else texto_limpo
     citacao = f"“{texto_limpo}”\n\n📖 {ref} — {nome_versao}"
     idx = len(ACOES_CLIPBOARD)
-    ACOES_CLIPBOARD.append({"copiar": citacao, "ouvir": texto_limpo})
+    ACOES_CLIPBOARD.append({"copiar": citacao, "ouvir": falado})
     return (
         '<div class="verse-actions">'
         f'<button class="verse-btn" id="acao-copiar-{idx}">📋 Copiar</button>'
@@ -515,7 +524,8 @@ if assunto:
                 if texto:
                     passagem_html = renderizar_passagem(k, r["livro"], r["capitulo"], r["versiculo"], assunto, contexto)
                     passagem_plana = texto_passagem_plano(k, r["livro"], r["capitulo"], r["versiculo"], contexto)
-                    corpo = f'<div class="verse-text">{passagem_html}</div>{botoes_acao(r["ref"], passagem_plana, versoes[k])}'
+                    passagem_falada = texto_passagem_falado(k, r["livro"], r["capitulo"], r["versiculo"], contexto)
+                    corpo = f'<div class="verse-text">{passagem_html}</div>{botoes_acao(r["ref"], passagem_plana, versoes[k], passagem_falada)}'
                 else:
                     corpo = '<div class="verse-missing">(versículo ausente nesta tradução)</div>'
                 colunas_html += f'<div class="compare-col"><div class="versao-label">{html.escape(versoes[k])}</div>{corpo}</div>'
@@ -531,11 +541,12 @@ if assunto:
         for r in resultados:
             passagem_html = renderizar_passagem(versao_base, r["livro"], r["capitulo"], r["versiculo"], assunto, contexto)
             passagem_plana = texto_passagem_plano(versao_base, r["livro"], r["capitulo"], r["versiculo"], contexto)
+            passagem_falada = texto_passagem_falado(versao_base, r["livro"], r["capitulo"], r["versiculo"], contexto)
             cartao = (
                 '<div class="verse-card">'
                 f'<div class="verse-ref">{html.escape(r["ref"])}<span class="verse-score">relevância {r["score"]:.2f}</span></div>'
                 f'<div class="verse-text">{passagem_html}</div>'
-                f'{botoes_acao(r["ref"], passagem_plana, versoes[versao_base])}'
+                f'{botoes_acao(r["ref"], passagem_plana, versoes[versao_base], passagem_falada)}'
                 '</div>'
             )
             st.markdown(cartao, unsafe_allow_html=True)
