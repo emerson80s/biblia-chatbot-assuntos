@@ -210,6 +210,20 @@ html, body, [class*="css"] {
     stroke: ${acento} !important;
     fill: none !important;
 }
+[data-testid="stSelectbox"] [data-testid="stTooltipIcon"],
+[data-testid="stSelectbox"] [data-testid="stTooltipIcon"] *,
+[data-testid="stSelectbox"] [data-testid="stTooltipIcon"] svg,
+[data-testid="stSelectbox"] [data-testid="stTooltipIcon"] svg path {
+    background: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    opacity: 1 !important;
+    fill: none !important;
+    stroke: ${acento} !important;
+}
 
 [data-testid="stHorizontalBlock"] {
     flex-direction: row !important;
