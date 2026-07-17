@@ -55,8 +55,8 @@ PALETA_ESCURA = {
 if "modo_escuro" not in st.session_state:
     st.session_state["modo_escuro"] = True
 
-topo_esq, topo_dir = st.columns([5, 1])
-with topo_dir:
+toggle_wrap = st.container(key="theme_toggle_wrap")
+with toggle_wrap:
     st.session_state["modo_escuro"] = st.toggle(
         "🌙" if st.session_state["modo_escuro"] else "☀️",
         value=st.session_state["modo_escuro"],
@@ -88,6 +88,14 @@ html, body, [class*="css"] {
 }
 [data-testid="stHeader"] {
     background: ${bg} !important;
+}
+
+.st-key-theme_toggle_wrap {
+    position: fixed;
+    top: 68px;
+    right: 18px;
+    z-index: 999999;
+    width: auto !important;
 }
 
 [data-testid="stSelectbox"] * {
@@ -321,20 +329,19 @@ st.markdown(CSS, unsafe_allow_html=True)
 
 BANNER_B64 = base64.b64encode(open("assets/biblia-banner.jpg", "rb").read()).decode()
 
-with topo_esq:
-    st.markdown(
-        '<div class="hero">'
-        f'<img class="hero-banner" src="data:image/jpeg;base64,{BANNER_B64}" alt="Bíblia de capa de couro preta com crucifixo"/>'
-        '<div class="hero-text">'
-        '<h1>Bíblia por Assunto</h1>'
-        '<p>Busca semântica de passagens por tema, não apenas por palavra exata, entre traduções de domínio público.</p>'
-        '</div></div>',
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    '<div class="hero">'
+    f'<img class="hero-banner" src="data:image/jpeg;base64,{BANNER_B64}" alt="Bíblia de capa de couro preta com crucifixo"/>'
+    '<div class="hero-text">'
+    '<h1>Bíblia por Assunto</h1>'
+    '<p>Busca semântica de passagens por tema, não apenas por palavra exata, entre traduções de domínio público.</p>'
+    '</div></div>',
+    unsafe_allow_html=True,
+)
 
 versoes = carregar_versoes_disponiveis()
 
-ASSUNTOS_POPULARES = ["perdão", "família", "gratidão", "esperança"]
+ASSUNTOS_POPULARES = ["perdão", "família", "gratidão", "amor"]
 
 if "assunto_input" not in st.session_state:
     st.session_state["assunto_input"] = ""
@@ -422,24 +429,6 @@ def limpar_travessoes(texto: str) -> str:
     return re.sub(r"\s{2,}", " ", texto).strip()
 
 
-def destacar(texto: str, termo: str) -> str:
-    texto = limpar_travessoes(texto)
-    escapado = html.escape(texto)
-    termo = termo.strip()
-    if not termo:
-        return escapado
-
-    # destaca a frase inteira quando aparece literalmente, e também cada
-    # palavra individual da busca (ex: "vida eterna" -> "vida" e "eterna"
-    # marcadas onde quer que apareçam, mesmo que não estejam juntas)
-    palavras = [html.escape(termo)] + [html.escape(p) for p in termo.split() if len(p) > 2]
-    padrao = re.compile(
-        r"\b(?:" + "|".join(re.escape(p) for p in palavras) + r")\b",
-        re.IGNORECASE,
-    )
-    return padrao.sub(lambda m: f"<mark>{m.group(0)}</mark>", escapado)
-
-
 def texto_passagem_plano(versao: str, livro: str, capitulo: int, versiculo: int, janela: int) -> str:
     passagem = obter_passagem(versao, livro, capitulo, versiculo, janela=janela)
     return " ".join(f'{v["num"]} {limpar_travessoes(v["texto"])}' for v in passagem)
@@ -449,7 +438,7 @@ def renderizar_passagem(versao: str, livro: str, capitulo: int, versiculo: int, 
     passagem = obter_passagem(versao, livro, capitulo, versiculo, janela=janela)
     partes = []
     for verso in passagem:
-        texto_html = destacar(verso["texto"], termo)
+        texto_html = html.escape(limpar_travessoes(verso["texto"]))
         if verso["central"]:
             partes.append(f'<span class="verso-central"><sup>{verso["num"]}</sup> {texto_html}</span>')
         else:
