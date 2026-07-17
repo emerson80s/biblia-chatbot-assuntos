@@ -5,6 +5,7 @@ import re
 from string import Template
 
 import streamlit as st
+import streamlit.components.v1 as components
 from buscador import (
     buscar_por_assunto,
     comparar_versoes,
@@ -459,16 +460,22 @@ def renderizar_passagem(versao: str, livro: str, capitulo: int, versiculo: int, 
     return " ".join(partes)
 
 
+# O Streamlit sanitiza o HTML de st.markdown e remove atributos onclick, então
+# os botões não podem carregar o handler inline. Em vez disso, acumulamos o texto
+# de cada botão e religamos os cliques no fim via um componente (ver rodapé).
+ACOES_CLIPBOARD: list[dict] = []
+
+
 def botoes_acao(ref: str, texto: str, nome_versao: str) -> str:
     texto_limpo = limpar_travessoes(texto)
-    citacao = f"“{texto_limpo}” — {ref} ({nome_versao})"
-    citacao_js = json.dumps(citacao)
-    texto_js = json.dumps(texto_limpo)
+    citacao = f"“{texto_limpo}”\n\n📖 {ref} — {nome_versao}"
+    idx = len(ACOES_CLIPBOARD)
+    ACOES_CLIPBOARD.append({"copiar": citacao, "ouvir": texto_limpo})
     return (
         '<div class="verse-actions">'
-        f"<button class=\"verse-btn\" onclick='navigator.clipboard.writeText({citacao_js})'>📋 Copiar</button>"
-        f"<button class=\"verse-btn\" onclick='speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance({texto_js}); u.lang=\"pt-BR\"; speechSynthesis.speak(u);'>🔊 Ouvir</button>"
-        "</div>"
+        f'<button class="verse-btn" id="acao-copiar-{idx}">📋 Copiar</button>'
+        f'<button class="verse-btn" id="acao-ouvir-{idx}">🔊 Ouvir</button>'
+        '</div>'
     )
 
 
@@ -538,3 +545,82 @@ st.markdown(
     'apenas traduções de domínio público · sem custo de API.</div>',
     unsafe_allow_html=True,
 )
+
+# Religa os cliques de Copiar/Ouvir. Como o Streamlit remove o onclick inline do
+# HTML sanitizado, um componente (iframe do mesmo domínio) alcança o documento pai
+# via window.parent e anexa os handlers usando o texto acumulado em ACOES_CLIPBOARD.
+if ACOES_CLIPBOARD:
+    dados_js = json.dumps(ACOES_CLIPBOARD)
+    components.html(
+        """
+<script>
+const dados = __DADOS__;
+const w = window.parent;
+const doc = w.document;
+
+function copiar(texto) {
+  // execCommand é síncrono e funciona dentro do gesto do clique — mais confiável
+  // aqui do que o clipboard assíncrono, que fica pendente sem ativação de usuário.
+  let ok = false;
+  try {
+    const ta = doc.createElement('textarea');
+    ta.value = texto;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.width = '1px';
+    ta.style.height = '1px';
+    ta.style.padding = '0';
+    ta.style.border = 'none';
+    ta.style.opacity = '0';
+    doc.body.appendChild(ta);
+    ta.focus({ preventScroll: true });
+    ta.select();
+    ok = doc.execCommand('copy');
+    doc.body.removeChild(ta);
+  } catch (e) { ok = false; }
+  // Bônus para navegadores modernos em contexto seguro (não bloqueia o feedback).
+  if (w.navigator.clipboard && w.navigator.clipboard.writeText) {
+    try { w.navigator.clipboard.writeText(texto).catch(() => {}); } catch (e) {}
+  }
+  return ok;
+}
+
+function feedback(btn) {
+  if (btn.dataset.mostrando) return;
+  const orig = btn.innerHTML;
+  btn.dataset.mostrando = '1';
+  btn.innerHTML = '✓ Copiado';
+  setTimeout(() => { btn.innerHTML = orig; delete btn.dataset.mostrando; }, 1500);
+}
+
+function falar(texto) {
+  w.speechSynthesis.cancel();
+  const u = new w.SpeechSynthesisUtterance(texto);
+  u.lang = 'pt-BR';
+  w.speechSynthesis.speak(u);
+}
+
+// Delegação de evento no body do documento pai: um único listener que resolve o
+// botão pelo id (acao-copiar-N / acao-ouvir-N). É imune à troca/reuso de nós do
+// DOM entre reruns do Streamlit — problema que um guard por-nó não resolve. O
+// listener é re-registrado a cada rerun para usar os dados atuais.
+function handler(e) {
+  const btn = e.target.closest('.verse-btn');
+  if (!btn || !btn.id) return;
+  const m = btn.id.match(/^acao-(copiar|ouvir)-(\\d+)$/);
+  if (!m) return;
+  const a = dados[parseInt(m[2], 10)];
+  if (!a) return;
+  if (m[1] === 'copiar') { copiar(a.copiar); feedback(btn); }
+  else { falar(a.ouvir); }
+}
+
+if (w.__bibliaHandler) doc.body.removeEventListener('click', w.__bibliaHandler);
+w.__bibliaHandler = handler;
+doc.body.addEventListener('click', handler);
+</script>
+""".replace("__DADOS__", dados_js),
+        height=0,
+    )
