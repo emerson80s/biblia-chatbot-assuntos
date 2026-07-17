@@ -207,7 +207,8 @@ html, body, [class*="css"] {
 }
 
 [data-testid="stTooltipIcon"] svg path {
-    stroke: ${tinta_fraca} !important;
+    stroke: ${acento} !important;
+    fill: none !important;
 }
 
 [data-testid="stHorizontalBlock"] {
