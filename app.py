@@ -429,9 +429,18 @@ def limpar_travessoes(texto: str) -> str:
 def destacar(texto: str, termo: str) -> str:
     texto = limpar_travessoes(texto)
     escapado = html.escape(texto)
-    if not termo.strip():
+    termo = termo.strip()
+    if not termo:
         return escapado
-    padrao = re.compile(re.escape(html.escape(termo)), re.IGNORECASE)
+
+    # destaca a frase inteira quando aparece literalmente, e também cada
+    # palavra individual da busca (ex: "vida eterna" -> "vida" e "eterna"
+    # marcadas onde quer que apareçam, mesmo que não estejam juntas)
+    palavras = [html.escape(termo)] + [html.escape(p) for p in termo.split() if len(p) > 2]
+    padrao = re.compile(
+        r"\b(?:" + "|".join(re.escape(p) for p in palavras) + r")\b",
+        re.IGNORECASE,
+    )
     return padrao.sub(lambda m: f"<mark>{m.group(0)}</mark>", escapado)
 
 
