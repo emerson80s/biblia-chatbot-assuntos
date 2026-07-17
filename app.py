@@ -368,7 +368,7 @@ st.markdown('<div class="secao-label">Sugestões</div>', unsafe_allow_html=True)
 cols = st.columns(len(ASSUNTOS_POPULARES))
 for i, topico in enumerate(ASSUNTOS_POPULARES):
     with cols[i]:
-        if st.button(topico, key=f"pop_{topico}"):
+        if st.button(topico.capitalize(), key=f"pop_{topico}"):
             st.session_state["assunto_input"] = topico
 
 if st.session_state["historico"]:
