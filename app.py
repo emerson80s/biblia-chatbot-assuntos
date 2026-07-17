@@ -206,14 +206,15 @@ html, body, [class*="css"] {
     color: ${tinta_fraca} !important;
 }
 
-[data-testid="stTooltipIcon"] svg path {
+[data-testid="stTooltipIcon"] svg path, [data-testid="stTooltipIcon"] svg circle {
     stroke: ${acento} !important;
     fill: none !important;
 }
 [data-testid="stSelectbox"] [data-testid="stTooltipIcon"],
 [data-testid="stSelectbox"] [data-testid="stTooltipIcon"] *,
 [data-testid="stSelectbox"] [data-testid="stTooltipIcon"] svg,
-[data-testid="stSelectbox"] [data-testid="stTooltipIcon"] svg path {
+[data-testid="stSelectbox"] [data-testid="stTooltipIcon"] svg path,
+[data-testid="stSelectbox"] [data-testid="stTooltipIcon"] svg circle {
     background: none !important;
     background-color: transparent !important;
     box-shadow: none !important;
